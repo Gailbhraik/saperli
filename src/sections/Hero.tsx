@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Trophy, Users, Radio, Gamepad2, Zap } from 'lucide-react';
+import { ArrowRight, Trophy, Radio, Gamepad2, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface User {
@@ -185,9 +185,8 @@ export function Hero({ user, onOpenAuth, onViewAllBets }: HeroProps) {
           <div className="space-y-8">
             {/* Badge */}
             <div
-              className={`inline-flex items-center gap-3 px-4 py-2 bg-[#00d4ff]/10 border border-[#00d4ff]/30 rounded-full transition-all duration-700 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
+              className={`inline-flex items-center gap-3 px-4 py-2 bg-[#00d4ff]/10 border border-[#00d4ff]/30 rounded-full transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                }`}
               style={{ transitionDelay: '200ms' }}
             >
               <Gamepad2 className="w-4 h-4 text-[#00d4ff]" />
@@ -201,9 +200,8 @@ export function Hero({ user, onOpenAuth, onViewAllBets }: HeroProps) {
               {['PARIEZ SUR', 'LA LEC & LFL'].map((line, lineIndex) => (
                 <div
                   key={lineIndex}
-                  className={`block text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight transition-all duration-800 ${
-                    isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-                  }`}
+                  className={`block text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight transition-all duration-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+                    }`}
                   style={{
                     transitionDelay: `${400 + lineIndex * 100}ms`,
                     textShadow: '0 0 40px rgba(0, 212, 255, 0.3)',
@@ -216,27 +214,25 @@ export function Hero({ user, onOpenAuth, onViewAllBets }: HeroProps) {
 
             {/* Subtitle */}
             <p
-              className={`text-lg text-[#b3b3b3] max-w-xl leading-relaxed transition-all duration-700 ${
-                isVisible ? 'opacity-100 translate-y-0 blur-0' : 'opacity-0 translate-y-8 blur-sm'
-              }`}
+              className={`text-lg text-[#b3b3b3] max-w-xl leading-relaxed transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0 blur-0' : 'opacity-0 translate-y-8 blur-sm'
+                }`}
               style={{ transitionDelay: '700ms' }}
             >
-              Les meilleures cotes sur tous les matchs de League of Legends. 
+              Les meilleures cotes sur tous les matchs de League of Legends.
               LEC, LFL, LCK, LPL et plus encore. Paris en direct et cash-out instantané.
             </p>
 
             {/* League Badges */}
             <div
-              className={`flex flex-wrap gap-3 transition-all duration-700 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
+              className={`flex flex-wrap gap-3 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
               style={{ transitionDelay: '800ms' }}
             >
               {leagues.map((league) => (
                 <div
                   key={league.name}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg border"
-                  style={{ 
+                  style={{
                     backgroundColor: `${league.color}15`,
                     borderColor: `${league.color}40`
                   }}
@@ -251,9 +247,8 @@ export function Hero({ user, onOpenAuth, onViewAllBets }: HeroProps) {
 
             {/* CTAs */}
             <div
-              className={`flex flex-wrap gap-4 transition-all duration-600 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
+              className={`flex flex-wrap gap-4 transition-all duration-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
               style={{ transitionDelay: '900ms' }}
             >
               {user.isLoggedIn ? (
@@ -292,9 +287,8 @@ export function Hero({ user, onOpenAuth, onViewAllBets }: HeroProps) {
 
             {/* Stats */}
             <div
-              className={`flex flex-wrap gap-8 pt-8 transition-all duration-600 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-              }`}
+              className={`flex flex-wrap gap-8 pt-8 transition-all duration-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                }`}
               style={{ transitionDelay: '1100ms' }}
             >
               {stats.map((stat, index) => (
@@ -317,15 +311,14 @@ export function Hero({ user, onOpenAuth, onViewAllBets }: HeroProps) {
 
           {/* Right Visual - Featured Match Card */}
           <div
-            className={`hidden lg:flex justify-center items-center transition-all duration-1000 ${
-              isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'
-            }`}
+            className={`hidden lg:flex justify-center items-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'
+              }`}
             style={{ transitionDelay: '800ms' }}
           >
             <div className="relative">
               {/* Glow Effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-[#00d4ff]/30 to-[#8b5cf6]/30 rounded-3xl blur-3xl" />
-              
+
               {/* Main Card */}
               <div className="relative bg-[#141414] border border-[#2a2a2a] rounded-2xl p-6 w-80">
                 {/* Header */}

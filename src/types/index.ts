@@ -66,3 +66,5 @@ export interface League {
   flag: string;
   color: string;
 }
+
+export type SportType = 'football' | 'tennis' | 'basketball' | 'esports';

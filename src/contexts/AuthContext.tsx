@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import type { ReactNode } from 'react';
 
 // Types
 export interface UserAccount {
@@ -29,25 +30,25 @@ interface AuthContextType {
   currentUser: UserAccount | null;
   isLoggedIn: boolean;
   isLoading: boolean;
-  
+
   login: (username: string, password: string) => { success: boolean; error?: string };
   register: (username: string, password: string) => { success: boolean; error?: string };
   logout: () => void;
-  
+
   addBalance: (amount: number) => void;
   removeBalance: (amount: number) => void;
   canBet: (amount: number) => boolean;
-  
+
   betHistory: BetHistory[];
   placeBet: (bet: Omit<BetHistory, 'id' | 'status' | 'createdAt'>) => { success: boolean; error?: string; bet?: BetHistory };
   settleBet: (betId: string, result: 'won' | 'lost') => void;
-  
+
   getPendingBets: () => BetHistory[];
   getWonBets: () => BetHistory[];
   getLostBets: () => BetHistory[];
   getTotalWinnings: () => number;
   getTotalLosses: () => number;
-  
+
   resetAccount: () => void;
   deleteAccount: () => void;
 }
@@ -77,11 +78,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const savedUsers = localStorage.getItem(USERS_KEY);
     const savedCurrentUserId = localStorage.getItem(CURRENT_USER_KEY);
-    
+
     if (savedUsers) {
       const parsedUsers = JSON.parse(savedUsers) as UserAccount[];
       setUsers(parsedUsers);
-      
+
       if (savedCurrentUserId) {
         const user = parsedUsers.find(u => u.id === savedCurrentUserId);
         if (user) {
@@ -121,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback((username: string, password: string) => {
     const trimmedUsername = username.trim().toLowerCase();
-    
+
     if (trimmedUsername.length < 3) {
       return { success: false, error: 'Le pseudo doit contenir au moins 3 caractères' };
     }
@@ -134,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (password.length < 4) {
       return { success: false, error: 'Le mot de passe doit contenir au moins 4 caractères' };
     }
-    
+
     if (users.some(u => u.username === trimmedUsername)) {
       return { success: false, error: 'Ce pseudo est déjà pris' };
     }
@@ -151,31 +152,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUsers(prev => [...prev, newUser]);
     setCurrentUser(newUser);
     setBetHistory([]);
-    
+
     return { success: true };
   }, [users]);
 
   const login = useCallback((username: string, password: string) => {
     const trimmedUsername = username.trim().toLowerCase();
     const user = users.find(u => u.username === trimmedUsername);
-    
+
     if (!user) {
       return { success: false, error: 'Pseudo ou mot de passe incorrect' };
     }
-    
+
     if (user.passwordHash !== simpleHash(password)) {
       return { success: false, error: 'Pseudo ou mot de passe incorrect' };
     }
 
     setCurrentUser(user);
-    
+
     const savedBets = localStorage.getItem(BETS_PREFIX + user.id);
     if (savedBets) {
       setBetHistory(JSON.parse(savedBets));
     } else {
       setBetHistory([]);
     }
-    
+
     return { success: true };
   }, [users]);
 
@@ -203,7 +204,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!currentUser) {
       return { success: false, error: 'Vous devez être connecté pour parier' };
     }
-    
+
     if (!canBet(bet.stake)) {
       return { success: false, error: 'Solde insuffisant' };
     }
@@ -245,7 +246,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const deleteAccount = useCallback(() => {
     if (!currentUser) return;
-    
+
     setUsers(prev => prev.filter(u => u.id !== currentUser.id));
     localStorage.removeItem(BETS_PREFIX + currentUser.id);
     logout();

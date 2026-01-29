@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, User as UserIcon, Wallet, LogOut, LogIn, Gamepad2, List, Users, Trophy } from 'lucide-react';
+import { Menu, X, User as UserIcon, Wallet, LogOut, LogIn, Gamepad2, List, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -12,7 +12,7 @@ interface NavigationProps {
 export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
   const { currentUser, isLoggedIn, logout } = useAuth();
 
   useEffect(() => {
@@ -32,11 +32,10 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
           ? 'bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-[#2a2a2a]'
           : 'bg-transparent'
-      }`}
+        }`}
       style={{
         height: isScrolled ? '64px' : '80px',
       }}
@@ -72,9 +71,9 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
                 <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-[#00d4ff] transition-all duration-300 group-hover:w-full group-hover:left-0" />
               </a>
             ))}
-            
+
             <div className="h-6 w-px bg-[#2a2a2a]" />
-            
+
             <button
               onClick={onViewAllBets}
               className="text-[#00d4ff] hover:text-white transition-colors duration-300 text-sm font-medium flex items-center gap-1.5 px-3 py-1.5 bg-[#00d4ff]/10 rounded-lg border border-[#00d4ff]/30 hover:bg-[#00d4ff]/20"
@@ -82,7 +81,7 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
               <List className="w-4 h-4" />
               Paris
             </button>
-            
+
             <button
               onClick={onViewProfiles}
               className="text-[#8b5cf6] hover:text-white transition-colors duration-300 text-sm font-medium flex items-center gap-1.5 px-3 py-1.5 bg-[#8b5cf6]/10 rounded-lg border border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/20"
@@ -100,12 +99,12 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
                   <Wallet className="w-4 h-4 text-[#1aff6e]" />
                   <span className="text-[#1aff6e] font-bold">{currentUser.balance.toFixed(2)} €</span>
                 </div>
-                
+
                 <div className="flex items-center gap-2 px-4 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
                   <UserIcon className="w-4 h-4 text-[#b3b3b3]" />
                   <span className="text-white font-medium">{currentUser.username}</span>
                 </div>
-                
+
                 <Button
                   variant="ghost"
                   onClick={logout}
@@ -125,7 +124,7 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
                   <LogIn className="w-4 h-4 mr-2" />
                   Connexion
                 </Button>
-                
+
                 <Button
                   onClick={() => onOpenAuth('register')}
                   className="bg-gradient-to-r from-[#00d4ff] to-[#8b5cf6] text-white font-bold hover:opacity-90"
@@ -148,9 +147,8 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden absolute top-full left-0 right-0 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-[#2a2a2a] transition-all duration-500 ${
-          isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-        }`}
+        className={`md:hidden absolute top-full left-0 right-0 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-[#2a2a2a] transition-all duration-500 ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+          }`}
       >
         <div className="px-4 py-6 space-y-4">
           {isLoggedIn && currentUser ? (
@@ -197,7 +195,7 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
               </Button>
             </div>
           )}
-          
+
           {/* Quick Actions */}
           <div className="grid grid-cols-2 gap-3">
             <button
@@ -221,7 +219,7 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
               Classement
             </button>
           </div>
-          
+
           {navLinks.map((link) => (
             <a
               key={link.label}
