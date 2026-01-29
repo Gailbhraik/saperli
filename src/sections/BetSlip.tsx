@@ -1,4 +1,5 @@
-import { X, Trash2, ChevronUp, ChevronDown, AlertCircle, CheckCircle, LogIn } from 'lucide-react';
+import { useState } from 'react';
+import { X, Trash2, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, LogIn, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useBetSlip } from '@/hooks/useBetSlip';
 import { cn } from '@/lib/utils';
@@ -14,6 +15,7 @@ interface BetSlipProps {
 
 export function BetSlip({ betSlip, userBalance, matches, onLoginRequired }: BetSlipProps) {
   const { isLoggedIn } = useAuth();
+  const [isMinimized, setIsMinimized] = useState(false);
   
   const { 
     bets, 
@@ -45,6 +47,7 @@ export function BetSlip({ betSlip, userBalance, matches, onLoginRequired }: BetS
     return matches.find(m => m.id === matchId);
   };
 
+  // Si aucun pari et pas ouvert, ne rien afficher
   if (bets.length === 0 && !isOpen) return null;
 
   return (
@@ -60,9 +63,7 @@ export function BetSlip({ betSlip, userBalance, matches, onLoginRequired }: BetS
         )}
       >
         <div className="relative">
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
+          <Receipt className="w-6 h-6" />
           {bets.length > 0 && (
             <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
               {bets.length}
@@ -71,20 +72,48 @@ export function BetSlip({ betSlip, userBalance, matches, onLoginRequired }: BetS
         </div>
       </button>
 
+      {/* Desktop Minimized Toggle */}
+      {isMinimized && (
+        <button
+          onClick={() => setIsMinimized(false)}
+          className={cn(
+            'hidden lg:flex fixed right-0 top-1/2 -translate-y-1/2 z-50 items-center gap-2 px-3 py-4 rounded-l-xl shadow-lg transition-all duration-300',
+            bets.length > 0
+              ? 'bg-gradient-to-r from-[#1aff6e] to-[#00d9a3] text-[#0a0a0a]'
+              : 'bg-[#1a1a1a] text-white border border-[#2a2a2a] border-r-0'
+          )}
+        >
+          <ChevronLeft className="w-5 h-5" />
+          <div className="flex flex-col items-center">
+            <Receipt className="w-5 h-5" />
+            {bets.length > 0 && (
+              <span className="text-xs font-bold mt-1">{bets.length}</span>
+            )}
+          </div>
+        </button>
+      )}
+
       {/* Bet Slip Panel */}
       <div
         className={cn(
-          'fixed right-0 top-0 h-full w-full sm:w-96 bg-[#141414] border-l border-[#2a2a2a] shadow-2xl z-50 transition-transform duration-500 lg:translate-x-0',
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+          'fixed right-0 top-0 h-full w-full sm:w-96 bg-[#141414] border-l border-[#2a2a2a] shadow-2xl z-50 transition-transform duration-500',
+          // Mobile: contrôlé par isOpen
+          isOpen ? 'translate-x-0' : 'translate-x-full',
+          // Desktop: contrôlé par isMinimized
+          'lg:translate-x-0',
+          isMinimized && 'lg:translate-x-full'
         )}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[#2a2a2a]">
           <div className="flex items-center gap-3">
+            <Receipt className="w-5 h-5 text-[#1aff6e]" />
             <h3 className="text-lg font-bold text-white">Ticket de Paris</h3>
-            <span className="px-2 py-0.5 bg-[#1aff6e]/20 text-[#1aff6e] text-xs font-semibold rounded-full">
-              {bets.length}
-            </span>
+            {bets.length > 0 && (
+              <span className="px-2 py-0.5 bg-[#1aff6e]/20 text-[#1aff6e] text-xs font-semibold rounded-full">
+                {bets.length}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {bets.length > 0 && (
@@ -96,9 +125,19 @@ export function BetSlip({ betSlip, userBalance, matches, onLoginRequired }: BetS
                 <Trash2 className="w-5 h-5" />
               </button>
             )}
+            {/* Desktop minimize button */}
+            <button
+              onClick={() => setIsMinimized(true)}
+              className="hidden lg:flex p-2 text-[#666] hover:text-white transition-colors"
+              title="Réduire le ticket"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+            {/* Mobile close button */}
             <button
               onClick={closeSlip}
               className="p-2 text-[#666] hover:text-white transition-colors lg:hidden"
+              title="Fermer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -128,12 +167,10 @@ export function BetSlip({ betSlip, userBalance, matches, onLoginRequired }: BetS
           {bets.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
               <div className="w-20 h-20 bg-[#1a1a1a] rounded-full flex items-center justify-center mb-4">
-                <svg className="w-10 h-10 text-[#666]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
+                <Receipt className="w-10 h-10 text-[#666]" />
               </div>
               <p className="text-[#b3b3b3] mb-2">Votre ticket est vide</p>
-              <p className="text-[#666] text-sm">Sélectionnez des cotes pour commencer à parier</p>
+              <p className="text-[#666] text-sm">Cliquez sur une cote pour ajouter un pari</p>
             </div>
           ) : (
             <div className="p-4 space-y-4">
@@ -254,12 +291,17 @@ function BetItem({ bet, match, onRemove, onUpdateStake }: BetItemProps) {
   };
 
   return (
-    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4">
+    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 hover:border-[#3a3a3a] transition-colors">
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
           {match && (
             <p className="text-[#666] text-xs mb-1 truncate">
+              {match.league}
+            </p>
+          )}
+          {match && (
+            <p className="text-white text-sm mb-2 truncate">
               {match.homeTeam.name} vs {match.awayTeam.name}
             </p>
           )}
@@ -267,13 +309,13 @@ function BetItem({ bet, match, onRemove, onUpdateStake }: BetItemProps) {
             <span className="px-2 py-1 bg-[#1aff6e]/20 text-[#1aff6e] text-xs font-bold rounded">
               {selectionLabels[bet.selection]}
             </span>
-            <span className="text-white text-sm">{selectionNames[bet.selection]}</span>
-            <span className="text-[#1aff6e] font-bold">@ {bet.odds.toFixed(2)}</span>
+            <span className="text-[#b3b3b3] text-sm">{selectionNames[bet.selection]}</span>
+            <span className="text-[#1aff6e] font-bold ml-auto">@ {bet.odds.toFixed(2)}</span>
           </div>
         </div>
         <button
           onClick={onRemove}
-          className="p-1 text-[#666] hover:text-red-500 transition-colors flex-shrink-0"
+          className="p-1.5 text-[#666] hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0 ml-2"
         >
           <X className="w-4 h-4" />
         </button>
@@ -282,8 +324,9 @@ function BetItem({ bet, match, onRemove, onUpdateStake }: BetItemProps) {
       {/* Stake Input */}
       <div className="flex items-center gap-3">
         <button
-          onClick={() => onUpdateStake(bet.stake - 5)}
-          className="w-8 h-8 bg-[#2a2a2a] hover:bg-[#3a3a3a] rounded-lg flex items-center justify-center transition-colors"
+          onClick={() => onUpdateStake(Math.max(1, bet.stake - 5))}
+          disabled={bet.stake <= 1}
+          className="w-8 h-8 bg-[#2a2a2a] hover:bg-[#3a3a3a] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-colors"
         >
           <ChevronDown className="w-4 h-4 text-white" />
         </button>
@@ -291,8 +334,8 @@ function BetItem({ bet, match, onRemove, onUpdateStake }: BetItemProps) {
           <input
             type="number"
             value={bet.stake}
-            onChange={(e) => onUpdateStake(parseFloat(e.target.value) || 0)}
-            className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-white text-center font-semibold focus:outline-none focus:border-[#1aff6e]"
+            onChange={(e) => onUpdateStake(Math.max(1, parseFloat(e.target.value) || 1))}
+            className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-white text-center font-semibold focus:outline-none focus:border-[#1aff6e] transition-colors"
             min="1"
             step="1"
           />
@@ -304,6 +347,24 @@ function BetItem({ bet, match, onRemove, onUpdateStake }: BetItemProps) {
         >
           <ChevronUp className="w-4 h-4 text-white" />
         </button>
+      </div>
+
+      {/* Quick Stakes */}
+      <div className="flex gap-2 mt-3">
+        {[5, 10, 20, 50].map((amount) => (
+          <button
+            key={amount}
+            onClick={() => onUpdateStake(amount)}
+            className={cn(
+              'flex-1 py-1.5 text-xs font-medium rounded-lg transition-colors',
+              bet.stake === amount
+                ? 'bg-[#1aff6e]/20 text-[#1aff6e] border border-[#1aff6e]/30'
+                : 'bg-[#2a2a2a] text-[#b3b3b3] hover:bg-[#3a3a3a]'
+            )}
+          >
+            {amount}€
+          </button>
+        ))}
       </div>
 
       {/* Potential Win */}

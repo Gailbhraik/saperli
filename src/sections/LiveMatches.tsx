@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Radio, Gamepad2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Radio, Gamepad2, Info } from 'lucide-react';
 import type { EsportsMatch } from '@/types';
 import type { useBetSlip } from '@/hooks/useBetSlip';
 import { cn } from '@/lib/utils';
+import { MatchDetailsModal } from '@/components/MatchDetailsModal';
+import { LEAGUE_LOGOS, getLeagueColor } from '@/services/api';
 
 interface LiveMatchesProps {
   betSlip: ReturnType<typeof useBetSlip>;
@@ -14,6 +16,7 @@ interface LiveMatchesProps {
 export function LiveMatches({ betSlip, liveMatches, upcomingMatches, loading }: LiveMatchesProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState<EsportsMatch | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -38,6 +41,18 @@ export function LiveMatches({ betSlip, liveMatches, upcomingMatches, loading }: 
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
       });
+    }
+  };
+
+  const handleMatchClick = (match: EsportsMatch) => {
+    setSelectedMatch(match);
+  };
+
+  const handleBetFromModal = (selection: 'home' | 'away') => {
+    if (selectedMatch) {
+      const odds = selection === 'home' ? selectedMatch.odds.home : selectedMatch.odds.away;
+      betSlip.addBet(selectedMatch, selection, odds);
+      setSelectedMatch(null);
     }
   };
 
@@ -111,6 +126,7 @@ export function LiveMatches({ betSlip, liveMatches, upcomingMatches, loading }: 
                 index={index}
                 isVisible={isVisible}
                 betSlip={betSlip}
+                onMatchClick={handleMatchClick}
               />
             ))
           ) : (
@@ -120,6 +136,14 @@ export function LiveMatches({ betSlip, liveMatches, upcomingMatches, loading }: 
           )}
         </div>
       </div>
+
+      {/* Match Details Modal */}
+      <MatchDetailsModal
+        match={selectedMatch!}
+        isOpen={!!selectedMatch}
+        onClose={() => setSelectedMatch(null)}
+        onBet={handleBetFromModal}
+      />
     </section>
   );
 }
@@ -129,27 +153,25 @@ interface MatchCardProps {
   index: number;
   isVisible: boolean;
   betSlip: ReturnType<typeof useBetSlip>;
+  onMatchClick: (match: EsportsMatch) => void;
 }
 
-function MatchCard({ match, index, isVisible, betSlip }: MatchCardProps) {
+function MatchCard({ match, index, isVisible, betSlip, onMatchClick }: MatchCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const isLive = match.status === 'live';
   const existingBet = betSlip.getBetForMatch(match.id);
+  const leagueColor = getLeagueColor(match.league);
 
-  const handleOddsClick = (selection: 'home' | 'away', odds: number) => {
+  const handleOddsClick = (e: React.MouseEvent, selection: 'home' | 'away', odds: number) => {
+    e.stopPropagation();
     betSlip.addBet(match, selection, odds);
   };
 
-  const getLeagueColor = () => {
-    const league = match.league.toLowerCase();
-    if (league.includes('lec')) return '#00d4ff';
-    if (league.includes('lfl') || league.includes('french')) return '#0055A4';
-    if (league.includes('lck')) return '#e31c79';
-    if (league.includes('lpl')) return '#ff6b35';
-    return '#1aff6e';
-  };
-
-  const leagueColor = getLeagueColor();
+  // Déterminer le logo de la ligue
+  const leagueKey = match.league.toLowerCase().includes('lec') ? 'lec' : 
+                    match.league.toLowerCase().includes('lfl') ? 'lfl' :
+                    match.league.toLowerCase().includes('lck') ? 'lck' :
+                    match.league.toLowerCase().includes('lpl') ? 'lpl' : 'lol';
 
   return (
     <div
@@ -161,7 +183,8 @@ function MatchCard({ match, index, isVisible, betSlip }: MatchCardProps) {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className="bg-[#141414] border border-[#2a2a2a] rounded-xl overflow-hidden transition-all duration-300"
+        onClick={() => onMatchClick(match)}
+        className="bg-[#141414] border border-[#2a2a2a] rounded-xl overflow-hidden transition-all duration-300 cursor-pointer"
         style={{
           transform: isHovered ? 'translateY(-8px)' : 'translateY(0)',
           borderColor: isHovered ? leagueColor : undefined,
@@ -172,7 +195,17 @@ function MatchCard({ match, index, isVisible, betSlip }: MatchCardProps) {
           className="px-5 py-3 border-b border-[#2a2a2a] flex items-center justify-between"
           style={{ backgroundColor: `${leagueColor}10` }}
         >
-          <span className="text-sm font-medium" style={{ color: leagueColor }}>{match.league}</span>
+          <div className="flex items-center gap-2">
+            <img 
+              src={LEAGUE_LOGOS[leagueKey]} 
+              alt={match.league}
+              className="w-5 h-5 object-contain"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+            <span className="text-sm font-medium" style={{ color: leagueColor }}>{match.league}</span>
+          </div>
           {isLive ? (
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
@@ -196,9 +229,16 @@ function MatchCard({ match, index, isVisible, betSlip }: MatchCardProps) {
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-[#1a1a1a] rounded-full flex items-center justify-center overflow-hidden">
                   {match.homeTeam.logo ? (
-                    <img src={match.homeTeam.logo} alt="" className="w-5 h-5 object-contain" />
+                    <img 
+                      src={match.homeTeam.logo} 
+                      alt="" 
+                      className="w-5 h-5 object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
                   ) : (
-                    <span className="text-sm">🎮</span>
+                    <span className="text-xs font-bold text-[#666]">{match.homeTeam.name.charAt(0)}</span>
                   )}
                 </div>
                 <span className="text-white font-semibold truncate max-w-[120px]">{match.homeTeam.name}</span>
@@ -211,9 +251,16 @@ function MatchCard({ match, index, isVisible, betSlip }: MatchCardProps) {
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-[#1a1a1a] rounded-full flex items-center justify-center overflow-hidden">
                   {match.awayTeam.logo ? (
-                    <img src={match.awayTeam.logo} alt="" className="w-5 h-5 object-contain" />
+                    <img 
+                      src={match.awayTeam.logo} 
+                      alt="" 
+                      className="w-5 h-5 object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
                   ) : (
-                    <span className="text-sm">🎮</span>
+                    <span className="text-xs font-bold text-[#666]">{match.awayTeam.name.charAt(0)}</span>
                   )}
                 </div>
                 <span className="text-white font-semibold truncate max-w-[120px]">{match.awayTeam.name}</span>
@@ -225,15 +272,25 @@ function MatchCard({ match, index, isVisible, betSlip }: MatchCardProps) {
           </div>
 
           {match.format && (
-            <div className="text-center mb-4 py-2 bg-[#0a0a0a] rounded-lg">
+            <div className="flex items-center justify-between mb-4 py-2 px-3 bg-[#0a0a0a] rounded-lg">
               <span className="text-[#666] text-xs uppercase">{match.format}</span>
-              {match.currentGame && <span className="text-[#666] text-xs"> • Game {match.currentGame}</span>}
+              {match.currentGame && <span className="text-[#666] text-xs">Game {match.currentGame}</span>}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMatchClick(match);
+                }}
+                className="p-1 text-[#666] hover:text-white transition-colors"
+                title="Voir les statistiques"
+              >
+                <Info className="w-4 h-4" />
+              </button>
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-2">
             <button
-              onClick={() => handleOddsClick('home', match.odds.home)}
+              onClick={(e) => handleOddsClick(e, 'home', match.odds.home)}
               className={cn(
                 'py-2.5 px-3 rounded-lg border transition-all duration-200 flex flex-col items-center gap-0.5',
                 existingBet?.selection === 'home'
@@ -247,7 +304,7 @@ function MatchCard({ match, index, isVisible, betSlip }: MatchCardProps) {
               </span>
             </button>
             <button
-              onClick={() => handleOddsClick('away', match.odds.away)}
+              onClick={(e) => handleOddsClick(e, 'away', match.odds.away)}
               className={cn(
                 'py-2.5 px-3 rounded-lg border transition-all duration-200 flex flex-col items-center gap-0.5',
                 existingBet?.selection === 'away'

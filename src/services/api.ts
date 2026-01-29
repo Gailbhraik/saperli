@@ -12,7 +12,30 @@ const LEAGUE_IDS = {
   LPL: '98767991314006698',
 };
 
-// URLs des logos des équipes (CDN fiables)
+// Logos des ligues
+export const LEAGUE_LOGOS: Record<string, string> = {
+  'lec': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/8/86/LEC_2023_icon_allmode.png',
+  'lfl': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/d/d0/LFL_2023_lightmode.png',
+  'lck': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/a/a3/LCK_2024_icon_allmode.png',
+  'lpl': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/d/da/LPL_2024_icon_allmode.png',
+  'worlds': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/1/17/Worlds_2024_icon_allmode.png',
+  'msi': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/c/c6/MSI_2024_icon_allmode.png',
+  'lol': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/4/48/LoL_icon.png',
+};
+
+// Couleurs des ligues
+export function getLeagueColor(league: string): string {
+  const l = league.toLowerCase();
+  if (l.includes('lec')) return '#00d4ff';
+  if (l.includes('lfl')) return '#0055A4';
+  if (l.includes('lck')) return '#e31c79';
+  if (l.includes('lpl')) return '#ff6b35';
+  if (l.includes('worlds')) return '#f0b232';
+  if (l.includes('msi')) return '#8b5cf6';
+  return '#00d4ff';
+}
+
+// URLs des logos des équipes
 const TEAM_LOGOS: Record<string, string> = {
   // LEC Teams
   'g2': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/7/77/G2_Esportslogo_square.png',
@@ -50,21 +73,14 @@ const TEAM_LOGOS: Record<string, string> = {
 
 // Fonction pour obtenir le logo d'une équipe
 function getTeamLogo(teamId: string, teamName: string): string {
-  // Chercher par ID
   const normalizedId = teamId.toLowerCase().replace(/[^a-z0-9]/g, '');
-  if (TEAM_LOGOS[normalizedId]) {
-    return TEAM_LOGOS[normalizedId];
-  }
+  if (TEAM_LOGOS[normalizedId]) return TEAM_LOGOS[normalizedId];
   
-  // Chercher par nom
   const normalizedName = teamName.toLowerCase();
   for (const [key, url] of Object.entries(TEAM_LOGOS)) {
-    if (normalizedName.includes(key)) {
-      return url;
-    }
+    if (normalizedName.includes(key)) return url;
   }
   
-  // Logo par défaut
   return '';
 }
 
@@ -81,7 +97,7 @@ function generateOdds(team1Strength: number = 50, team2Strength: number = 50): {
   };
 }
 
-// Données réelles LEC Winter 2025 avec vrais matchs
+// Données LEC Winter 2025
 const FALLBACK_LEC_MATCHES: EsportsMatch[] = [
   {
     id: 'lec-1',
@@ -221,7 +237,7 @@ const FALLBACK_LFL_MATCHES: EsportsMatch[] = [
   },
 ];
 
-// Matchs internationaux (LCK, LPL)
+// Matchs internationaux
 const FALLBACK_INTERNATIONAL_MATCHES: EsportsMatch[] = [
   {
     id: 'lck-1',
@@ -297,7 +313,7 @@ const FALLBACK_INTERNATIONAL_MATCHES: EsportsMatch[] = [
   },
 ];
 
-// Matchs en direct simulés
+// Matchs en direct
 const FALLBACK_LIVE_MATCHES: EsportsMatch[] = [
   {
     id: 'live-1',
@@ -330,7 +346,7 @@ const FALLBACK_LIVE_MATCHES: EsportsMatch[] = [
   },
 ];
 
-// Transformer les données de l'API LoL Esports
+// Transformer les données de l'API
 function transformLoLEsportsMatch(event: any, isLive: boolean = false): EsportsMatch | null {
   const match = event.match;
   if (!match?.teams || match.teams.length < 2) return null;
@@ -450,17 +466,15 @@ export async function fetchEsportsMatches(): Promise<EsportsMatch[]> {
   try {
     const allMatches: EsportsMatch[] = [];
 
-    // Essayer de récupérer les matchs live
     const liveMatches = await fetchLiveMatches();
     allMatches.push(...liveMatches.filter(m => m.status === 'live'));
 
-    // Récupérer les matchs programmés
     for (const leagueId of Object.values(LEAGUE_IDS)) {
       try {
         const matches = await fetchSchedule(leagueId);
         allMatches.push(...matches);
       } catch {
-        // Ignorer les erreurs individuelles
+        // Ignorer
       }
     }
 
@@ -473,7 +487,6 @@ export async function fetchEsportsMatches(): Promise<EsportsMatch[]> {
       return allMatches;
     }
 
-    // Fallback
     return [...FALLBACK_LIVE_MATCHES, ...FALLBACK_LFL_MATCHES, ...FALLBACK_LEC_MATCHES, ...FALLBACK_INTERNATIONAL_MATCHES];
   } catch {
     return [...FALLBACK_LIVE_MATCHES, ...FALLBACK_LFL_MATCHES, ...FALLBACK_LEC_MATCHES, ...FALLBACK_INTERNATIONAL_MATCHES];
@@ -519,4 +532,4 @@ export async function fetchAllMatches(): Promise<{
   };
 }
 
-export { fetchLiveMatches, fetchSchedule, LEAGUE_IDS };
+export { fetchLiveMatches, fetchSchedule, LEAGUE_IDS, TEAM_LOGOS };

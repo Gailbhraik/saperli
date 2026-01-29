@@ -13,13 +13,14 @@ interface User {
 
 interface UseBetSlipProps {
   user: User;
-  placeBet: (bet: Omit<BetHistory, 'id' | 'status' | 'createdAt'>) => { success: boolean; error?: string; bet?: BetHistory };
+  placeBet: (bet: Omit<BetHistory, 'id' | 'status' | 'placedAt'>) => Promise<{ success: boolean; error?: string }>;
 }
 
 export function useBetSlip({ user, placeBet }: UseBetSlipProps) {
   const [bets, setBets] = useState<Bet[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPlacing, setIsPlacing] = useState(false);
 
   const addBet = useCallback((match: Match, selection: 'home' | 'draw' | 'away', odds: number) => {
     setBets(prev => {
@@ -32,7 +33,13 @@ export function useBetSlip({ user, placeBet }: UseBetSlipProps) {
         selection,
         odds,
         stake: 10, // Mise par défaut
-        potentialWin: 10 * odds
+        potentialWin: +(10 * odds).toFixed(2),
+        // Stocker les infos du match pour le pari
+        matchData: {
+          homeTeam: match.homeTeam.name,
+          awayTeam: match.awayTeam.name,
+          league: match.league,
+        }
       };
 
       if (existingIndex >= 0) {
@@ -53,13 +60,13 @@ export function useBetSlip({ user, placeBet }: UseBetSlipProps) {
   }, []);
 
   const updateStake = useCallback((betId: string, stake: number) => {
-    const validStake = Math.max(1, stake);
+    const validStake = Math.max(1, Math.round(stake));
     setBets(prev => prev.map(bet => {
       if (bet.id === betId) {
         return {
           ...bet,
           stake: validStake,
-          potentialWin: validStake * bet.odds
+          potentialWin: +(validStake * bet.odds).toFixed(2)
         };
       }
       return bet;
@@ -79,7 +86,7 @@ export function useBetSlip({ user, placeBet }: UseBetSlipProps) {
     setIsOpen(false);
   }, []);
 
-  const placeBets = useCallback(() => {
+  const placeBets = useCallback(async () => {
     if (bets.length === 0) {
       setError('Aucun pari sélectionné');
       return { success: false, error: 'Aucun pari sélectionné' };
@@ -98,29 +105,48 @@ export function useBetSlip({ user, placeBet }: UseBetSlipProps) {
       return { success: false, error: errorMsg };
     }
 
-    // Placer chaque pari
-    const placedBets: BetHistory[] = [];
-    for (const bet of bets) {
-      const result = placeBet({
-        matchId: bet.matchId,
-        homeTeam: '', // Sera rempli par le composant parent
-        awayTeam: '', // Sera rempli par le composant parent
-        selection: bet.selection,
-        odds: bet.odds,
-        stake: bet.stake,
-        potentialWin: bet.potentialWin,
-      });
-      
-      if (result.success && result.bet) {
-        placedBets.push(result.bet);
-      }
-    }
-
-    // Vider le panier après avoir placé les paris
-    setBets([]);
+    setIsPlacing(true);
     setError(null);
-    
-    return { success: true, bets: placedBets };
+
+    try {
+      // Placer chaque pari
+      for (const bet of bets) {
+        const matchData = (bet as any).matchData || {};
+        const selectedTeam = bet.selection === 'home' 
+          ? matchData.homeTeam 
+          : matchData.awayTeam;
+
+        const result = await placeBet({
+          matchId: bet.matchId,
+          homeTeam: matchData.homeTeam || 'Équipe 1',
+          awayTeam: matchData.awayTeam || 'Équipe 2',
+          league: matchData.league,
+          selection: bet.selection as 'home' | 'away',
+          selectedTeam: selectedTeam || (bet.selection === 'home' ? 'Équipe 1' : 'Équipe 2'),
+          odds: bet.odds,
+          stake: bet.stake,
+          potentialWin: bet.potentialWin,
+        });
+        
+        if (!result.success) {
+          setError(result.error || 'Erreur lors du placement du pari');
+          setIsPlacing(false);
+          return { success: false, error: result.error };
+        }
+      }
+
+      // Vider le panier après avoir placé les paris
+      setBets([]);
+      setError(null);
+      setIsPlacing(false);
+      
+      return { success: true };
+    } catch (err) {
+      const errorMsg = 'Erreur lors du placement des paris';
+      setError(errorMsg);
+      setIsPlacing(false);
+      return { success: false, error: errorMsg };
+    }
   }, [bets, user.balance, user.isLoggedIn, placeBet]);
 
   const totalStake = bets.reduce((sum, bet) => sum + bet.stake, 0);
@@ -134,12 +160,13 @@ export function useBetSlip({ user, placeBet }: UseBetSlipProps) {
     return bets.find(b => b.matchId === matchId);
   }, [bets]);
 
-  const canPlaceBets = user.isLoggedIn && totalStake <= user.balance && bets.length > 0;
+  const canPlaceBets = user.isLoggedIn && totalStake <= user.balance && bets.length > 0 && !isPlacing;
 
   return {
     bets,
     isOpen,
     error,
+    isPlacing,
     totalStake,
     totalPotentialWin,
     canPlaceBets,
