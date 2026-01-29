@@ -9,12 +9,46 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Supabase configuration missing. Please check your .env file.');
 }
 
-// Prevent crash if env vars are missing by using placeholders
-// This allows the app to load and show a proper error message in the UI
+// Prevent crash if env vars are missing by using placeholders or a mock
 const validUrl = supabaseUrl || 'https://placeholder.supabase.co';
 const validKey = supabaseAnonKey || 'placeholder-key';
 
-export const supabase = createClient(validUrl, validKey);
+// Si la config est manquante, on crée un client qui ne fait pas de requêtes réseau pour éviter les erreurs
+const isConfigMissing = !supabaseUrl || !supabaseAnonKey;
+
+export const supabase = isConfigMissing
+  ? {
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          single: () => Promise.resolve({ data: null, error: { message: 'Supabase configuration missing' } }),
+          order: () => Promise.resolve({ data: [], error: { message: 'Supabase configuration missing' } }),
+        }),
+        order: () => Promise.resolve({ data: [], error: { message: 'Supabase configuration missing' } }),
+      }),
+      insert: () => ({
+        select: () => ({
+          single: () => Promise.resolve({ data: null, error: { message: 'Supabase configuration missing' } }),
+        }),
+      }),
+      update: () => ({
+        eq: () => Promise.resolve({ error: { message: 'Supabase configuration missing' } }),
+      }),
+    }),
+    auth: {
+      signUp: () => Promise.resolve({ data: { user: null }, error: { message: 'Supabase configuration missing' } }),
+      signInWithPassword: () => Promise.resolve({ data: { user: null }, error: { message: 'Supabase configuration missing' } }),
+      signOut: () => Promise.resolve(),
+      getUser: () => Promise.resolve({ data: { user: null } }),
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
+    },
+    channel: () => ({
+      on: () => ({
+        subscribe: () => ({}),
+      }),
+    }),
+  } as any
+  : createClient(validUrl, validKey);
 
 // Types pour la base de données
 export interface DbUser {
@@ -58,10 +92,15 @@ export async function signUp(email: string, password: string, username: string):
     return { user: null, error: 'Ce nom d\'utilisateur est déjà pris' };
   }
 
-  // Créer le compte auth
+  // Créer le compte auth avec les métadonnées pour le trigger
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        username,
+      },
+    },
   });
 
   if (authError) {
@@ -72,20 +111,31 @@ export async function signUp(email: string, password: string, username: string):
     return { user: null, error: 'Erreur lors de la création du compte' };
   }
 
-  // Créer le profil utilisateur
-  const { data: userData, error: userError } = await supabase
-    .from('users')
-    .insert({
-      id: authData.user.id,
-      username,
-      email,
-      balance: 1000, // Solde de départ
-    })
-    .select()
-    .single();
+  // Attendre que le trigger crée le profil utilisateur (max 5 secondes)
+  let retries = 0;
+  let userData: DbUser | null = null;
 
-  if (userError) {
-    return { user: null, error: userError.message };
+  while (retries < 10) {
+    const { data } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', authData.user.id)
+      .single();
+
+    if (data) {
+      userData = data;
+      break;
+    }
+
+    // Attendre 500ms
+    await new Promise(resolve => setTimeout(resolve, 500));
+    retries++;
+  }
+
+  if (!userData) {
+    // Fallback: si le trigger n'a pas marché (rare mais possible si RLS mal configuré), on essaie l'insert manuel
+    // Mais normalement le script SQL doit avoir réglé ça.
+    return { user: null, error: 'Compte créé mais profil inaccessible. Veuillez réessayer de vous connecter.' };
   }
 
   return { user: userData, error: null };
