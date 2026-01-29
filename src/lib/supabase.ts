@@ -9,7 +9,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Supabase configuration missing. Please check your .env file.');
 }
 
-export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
+// Prevent crash if env vars are missing by using placeholders
+// This allows the app to load and show a proper error message in the UI
+const validUrl = supabaseUrl || 'https://placeholder.supabase.co';
+const validKey = supabaseAnonKey || 'placeholder-key';
+
+export const supabase = createClient(validUrl, validKey);
 
 // Types pour la base de données
 export interface DbUser {
