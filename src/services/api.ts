@@ -12,15 +12,15 @@ const LEAGUE_IDS = {
   LPL: '98767991314006698',
 };
 
-// Logos des ligues
+// Logos des ligues - Utiliser des URLs fiables qui permettent le hotlinking
 export const LEAGUE_LOGOS: Record<string, string> = {
-  'lec': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/8/86/LEC_2023_icon_allmode.png',
-  'lfl': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/d/d0/LFL_2023_lightmode.png',
-  'lck': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/a/a3/LCK_2024_icon_allmode.png',
-  'lpl': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/d/da/LPL_2024_icon_allmode.png',
-  'worlds': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/1/17/Worlds_2024_icon_allmode.png',
-  'msi': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/c/c6/MSI_2024_icon_allmode.png',
-  'lol': 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/4/48/LoL_icon.png',
+  'lec': 'https://am-a.akamaihd.net/image?resize=140:&f=http%3A%2F%2Fstatic.lolesports.com%2Fleagues%2F1592516205702_LEC-01-FullonDark.png',
+  'lfl': 'https://am-a.akamaihd.net/image?resize=140:&f=http%3A%2F%2Fstatic.lolesports.com%2Fleagues%2F1641199682498_LFL_Logo_2022_white1.png',
+  'lck': 'https://am-a.akamaihd.net/image?resize=140:&f=http%3A%2F%2Fstatic.lolesports.com%2Fleagues%2Flck-color-on-black.png',
+  'lpl': 'https://am-a.akamaihd.net/image?resize=140:&f=http%3A%2F%2Fstatic.lolesports.com%2Fleagues%2F1592516115322_LPL-01-FullonDark.png',
+  'worlds': 'https://am-a.akamaihd.net/image?resize=140:&f=http%3A%2F%2Fstatic.lolesports.com%2Fleagues%2F1592594612171_WorldsNewIcon.png',
+  'msi': 'https://am-a.akamaihd.net/image?resize=140:&f=http%3A%2F%2Fstatic.lolesports.com%2Fleagues%2F1592594634248_MSI-2019.png',
+  'lol': 'https://am-a.akamaihd.net/image?resize=140:&f=http%3A%2F%2Fstatic.lolesports.com%2Fleagues%2F1592516184297_LOL-01-FullonDark.png',
 };
 
 // Couleurs des ligues
@@ -75,12 +75,12 @@ const TEAM_LOGOS: Record<string, string> = {
 function getTeamLogo(teamId: string, teamName: string): string {
   const normalizedId = teamId.toLowerCase().replace(/[^a-z0-9]/g, '');
   if (TEAM_LOGOS[normalizedId]) return TEAM_LOGOS[normalizedId];
-  
+
   const normalizedName = teamName.toLowerCase();
   for (const [key, url] of Object.entries(TEAM_LOGOS)) {
     if (normalizedName.includes(key)) return url;
   }
-  
+
   return '';
 }
 
@@ -90,7 +90,7 @@ function generateOdds(team1Strength: number = 50, team2Strength: number = 50): {
   const prob1 = team1Strength / total;
   const prob2 = team2Strength / total;
   const margin = 1.05;
-  
+
   return {
     home: Math.max(1.10, +(margin / prob1).toFixed(2)),
     away: Math.max(1.10, +(margin / prob2).toFixed(2))
@@ -361,7 +361,7 @@ function transformLoLEsportsMatch(event: any, isLive: boolean = false): EsportsM
 
   let score: { home: number; away: number } | undefined;
   let currentGame: number | undefined;
-  
+
   if (isLive && team1.result && team2.result) {
     score = {
       home: team1.result.gameWins || 0,
@@ -421,7 +421,7 @@ async function fetchLiveMatches(): Promise<EsportsMatch[]> {
 
     const data = await response.json();
     const events = data?.data?.schedule?.events || [];
-    
+
     const liveMatches = events
       .filter((e: any) => e.state === 'inProgress' && e.type === 'match')
       .map((e: any) => transformLoLEsportsMatch(e, true))
@@ -450,7 +450,7 @@ async function fetchSchedule(leagueId?: string): Promise<EsportsMatch[]> {
 
     const data = await response.json();
     const events = data?.data?.schedule?.events || [];
-    
+
     return events
       .filter((e: any) => (e.state === 'unstarted' || e.state === 'inProgress') && e.type === 'match')
       .slice(0, 10)
@@ -502,25 +502,25 @@ export async function fetchAllMatches(): Promise<{
   live: EsportsMatch[];
 }> {
   const esports = await fetchEsportsMatches();
-  
+
   const lec = esports.filter(m => {
     const l = m.league.toLowerCase();
     return l.includes('lec') || l.includes('european championship');
   });
-  
+
   const lfl = esports.filter(m => {
     const l = m.league.toLowerCase();
     return l.includes('lfl') || l.includes('française') || l.includes('french');
   });
-  
+
   const live = esports.filter(m => m.status === 'live');
-  
+
   const international = esports.filter(m => {
     const l = m.league.toLowerCase();
-    return !l.includes('lec') && !l.includes('lfl') && 
-           !l.includes('european championship') && 
-           !l.includes('française') && !l.includes('french') &&
-           m.status !== 'live';
+    return !l.includes('lec') && !l.includes('lfl') &&
+      !l.includes('european championship') &&
+      !l.includes('française') && !l.includes('french') &&
+      m.status !== 'live';
   });
 
   return {
