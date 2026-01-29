@@ -33,8 +33,8 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
-          ? 'bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-[#2a2a2a]'
-          : 'bg-transparent'
+        ? 'bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-[#2a2a2a]'
+        : 'bg-transparent'
         }`}
       style={{
         height: isScrolled ? '64px' : '80px',
@@ -54,7 +54,7 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
               <Gamepad2 className="w-5 h-5 text-white" />
             </div>
             <span className="text-white font-bold text-xl tracking-tight">
-              Esport<span className="text-[#00d4ff]">Bet</span>
+              Saperli
             </span>
           </a>
 
