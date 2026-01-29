@@ -12,13 +12,13 @@ export function UserPanel({ onOpenAuth }: UserPanelProps) {
   const [showHistory, setShowHistory] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const { 
-    currentUser, 
-    isLoggedIn, 
-    betHistory, 
-    resetAccount, 
+  const {
+    currentUser,
+    isLoggedIn,
+    betHistory,
+    resetAccount,
     deleteAccount,
-    addBalance 
+    updateBalance
   } = useAuth();
 
   const pendingBets = betHistory.filter(b => b.status === 'pending');
@@ -108,7 +108,7 @@ export function UserPanel({ onOpenAuth }: UserPanelProps) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => addBalance(100)}
+                onClick={() => updateBalance(currentUser.balance + 100)}
                 className="flex-1 border-[#2a2a2a] text-[#1aff6e] hover:bg-[#1aff6e]/10"
               >
                 <Wallet className="w-4 h-4 mr-1" />
@@ -207,7 +207,7 @@ export function UserPanel({ onOpenAuth }: UserPanelProps) {
               ✕
             </button>
           </div>
-          
+
           {betHistory.length === 0 ? (
             <p className="text-[#666] text-center py-4">Aucun pari effectué</p>
           ) : (
@@ -215,25 +215,23 @@ export function UserPanel({ onOpenAuth }: UserPanelProps) {
               {betHistory.map(bet => (
                 <div
                   key={bet.id}
-                  className={`p-3 rounded-lg ${
-                    bet.status === 'won' ? 'bg-[#1aff6e]/10 border border-[#1aff6e]/30' :
-                    bet.status === 'lost' ? 'bg-red-500/10 border border-red-500/30' :
-                    'bg-[#0a0a0a] border border-[#2a2a2a]'
-                  }`}
+                  className={`p-3 rounded-lg ${bet.status === 'won' ? 'bg-[#1aff6e]/10 border border-[#1aff6e]/30' :
+                      bet.status === 'lost' ? 'bg-red-500/10 border border-red-500/30' :
+                        'bg-[#0a0a0a] border border-[#2a2a2a]'
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-white text-sm">{bet.homeTeam || 'Match'} vs {bet.awayTeam || ''}</span>
-                    <span className={`text-xs font-bold ${
-                      bet.status === 'won' ? 'text-[#1aff6e]' :
-                      bet.status === 'lost' ? 'text-red-500' :
-                      'text-[#ffa502]'
-                    }`}>
+                    <span className={`text-xs font-bold ${bet.status === 'won' ? 'text-[#1aff6e]' :
+                        bet.status === 'lost' ? 'text-red-500' :
+                          'text-[#ffa502]'
+                      }`}>
                       {bet.status === 'won' ? 'GAGNÉ' : bet.status === 'lost' ? 'PERDU' : 'EN COURS'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-xs text-[#666] mt-1">
                     <span>Mise: {bet.stake.toFixed(2)}€ @ {bet.odds.toFixed(2)}</span>
-                    <span>{new Date(bet.createdAt).toLocaleDateString('fr-FR')}</span>
+                    <span>{new Date(bet.placedAt).toLocaleDateString('fr-FR')}</span>
                   </div>
                   {bet.status === 'won' && (
                     <p className="text-[#1aff6e] text-xs mt-1">+{bet.potentialWin.toFixed(2)} €</p>

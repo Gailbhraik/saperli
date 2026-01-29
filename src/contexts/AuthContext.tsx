@@ -1,8 +1,8 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { 
-  supabase, 
-  signUp as supabaseSignUp, 
-  signIn as supabaseSignIn, 
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import {
+  supabase,
+  signUp as supabaseSignUp,
+  signIn as supabaseSignIn,
   signOut as supabaseSignOut,
   getCurrentUser,
   getUserBets,
@@ -40,6 +40,7 @@ export interface BetHistory {
 
 interface AuthContextType {
   user: User | null;
+  currentUser: User | null; // Alias for user
   isLoggedIn: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
@@ -47,9 +48,13 @@ interface AuthContextType {
   logout: () => void;
   updateBalance: (newBalance: number) => void;
   addBetToHistory: (bet: Omit<BetHistory, 'id' | 'placedAt' | 'status'>) => Promise<{ success: boolean; error?: string }>;
+  placeBet: (bet: Omit<BetHistory, 'id' | 'placedAt' | 'status'>) => Promise<{ success: boolean; error?: string }>; // Alias for addBetToHistory
   getBetHistory: () => BetHistory[];
+  betHistory: BetHistory[]; // Direct access
   getUserStatsData: () => Promise<UserStats | null>;
   isOnline: boolean;
+  resetAccount: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -293,10 +298,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const newHistory = [newBet, ...betHistory];
       setBetHistory(newHistory);
       localStorage.setItem(`betpro-bets-${user.id}`, JSON.stringify(newHistory));
-      
+
       // Mettre à jour le solde
       updateBalance(user.balance - bet.stake);
-      
+
       return { success: true };
     }
   };
@@ -336,10 +341,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   };
 
+  const resetAccount = async () => {
+    if (user) {
+      await updateBalance(1000);
+    }
+  };
+
+  const deleteAccount = async () => {
+    // Note: Deleting a user in Supabase typically requires admin rights or specific RLS policies.
+    // For now we will just sign out.
+    await logout();
+  };
+
   return (
     <AuthContext.Provider
       value={{
         user,
+        currentUser: user, // Alias
         isLoggedIn: !!user,
         isLoading,
         login,
@@ -347,9 +365,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         updateBalance,
         addBetToHistory,
+        placeBet: addBetToHistory, // Alias
         getBetHistory,
+        betHistory, // Direct access
         getUserStatsData,
         isOnline,
+        resetAccount,
+        deleteAccount,
       }}
     >
       {children}

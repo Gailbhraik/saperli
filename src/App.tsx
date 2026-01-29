@@ -25,10 +25,10 @@ function AppContent() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
   const [currentPage, setCurrentPage] = useState<PageType>('home');
-  
+
   const { currentUser, isLoggedIn, placeBet } = useAuth();
   const { allMatches, lecMatches, lflMatches, liveMatches, upcomingMatches, loading } = useMatches();
-  
+
   const userForBetSlip = {
     id: currentUser?.id || 'guest',
     name: currentUser?.username || 'Invité',
@@ -37,10 +37,10 @@ function AppContent() {
     currency: '€',
     isLoggedIn: isLoggedIn,
   };
-  
-  const betSlip = useBetSlip({ 
-    user: userForBetSlip, 
-    placeBet: (betData) => {
+
+  const betSlip = useBetSlip({
+    user: userForBetSlip,
+    placeBet: async (betData) => {
       if (!isLoggedIn) {
         toast.error('Connectez-vous pour parier', {
           description: 'Vous devez être connecté pour placer des paris.',
@@ -51,22 +51,22 @@ function AppContent() {
         });
         return { success: false, error: 'Non connecté' };
       }
-      
+
       const match = allMatches.find(m => m.id === betData.matchId);
       if (match) {
-        const result = placeBet({
+        const result = await placeBet({
           ...betData,
           homeTeam: match.homeTeam.name,
           awayTeam: match.awayTeam.name,
           league: match.league, // Ajouter la ligue
         });
-        
+
         if (result.success) {
           toast.success('Pari placé !', {
             description: `${match.homeTeam.name} vs ${match.awayTeam.name} - Mise: ${betData.stake}€`,
           });
         }
-        
+
         return result;
       }
       return { success: false, error: 'Match non trouvé' };
@@ -88,14 +88,14 @@ function AppContent() {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-white font-sans">
         <ProfilesPage onBack={() => handleNavigate('home')} />
-        
-        <AuthModal 
+
+        <AuthModal
           isOpen={authModalOpen}
           onClose={() => setAuthModalOpen(false)}
           defaultTab={authModalTab}
         />
-        
-        <Toaster 
+
+        <Toaster
           position="top-center"
           toastOptions={{
             style: {
@@ -118,8 +118,8 @@ function AppContent() {
             all: allMatches,
             lec: lecMatches,
             lfl: lflMatches,
-            international: allMatches.filter(m => 
-              !m.league.toLowerCase().includes('lec') && 
+            international: allMatches.filter(m =>
+              !m.league.toLowerCase().includes('lec') &&
               !m.league.toLowerCase().includes('lfl')
             ),
             live: liveMatches,
@@ -127,21 +127,21 @@ function AppContent() {
           betSlip={betSlip}
           onBack={() => handleNavigate('home')}
         />
-        
-        <BetSlip 
-          betSlip={betSlip} 
+
+        <BetSlip
+          betSlip={betSlip}
           userBalance={currentUser?.balance || 0}
           matches={allMatches}
           onLoginRequired={() => handleOpenAuth('login')}
         />
-        
-        <AuthModal 
+
+        <AuthModal
           isOpen={authModalOpen}
           onClose={() => setAuthModalOpen(false)}
           defaultTab={authModalTab}
         />
-        
-        <Toaster 
+
+        <Toaster
           position="top-center"
           toastOptions={{
             style: {
@@ -158,26 +158,26 @@ function AppContent() {
   // Page d'accueil
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-sans">
-      <Navigation 
-        onOpenAuth={handleOpenAuth} 
+      <Navigation
+        onOpenAuth={handleOpenAuth}
         onViewAllBets={() => handleNavigate('all-bets')}
         onViewProfiles={() => handleNavigate('profiles')}
       />
-      
+
       <main>
-        <Hero 
-          user={userForBetSlip} 
+        <Hero
+          user={userForBetSlip}
           onOpenAuth={handleOpenAuth}
           onViewAllBets={() => handleNavigate('all-bets')}
         />
-        <LiveMatches 
-          betSlip={betSlip} 
+        <LiveMatches
+          betSlip={betSlip}
           liveMatches={liveMatches}
           upcomingMatches={upcomingMatches}
           loading={loading}
         />
-        <EsportsSection 
-          betSlip={betSlip} 
+        <EsportsSection
+          betSlip={betSlip}
           lecMatches={lecMatches}
           lflMatches={lflMatches}
           liveMatches={liveMatches}
@@ -190,23 +190,23 @@ function AppContent() {
       </main>
 
       <Footer />
-      
+
       <UserPanel onOpenAuth={handleOpenAuth} />
-      
-      <BetSlip 
-        betSlip={betSlip} 
+
+      <BetSlip
+        betSlip={betSlip}
         userBalance={currentUser?.balance || 0}
         matches={allMatches}
         onLoginRequired={() => handleOpenAuth('login')}
       />
-      
-      <AuthModal 
+
+      <AuthModal
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
         defaultTab={authModalTab}
       />
-      
-      <Toaster 
+
+      <Toaster
         position="top-center"
         toastOptions={{
           style: {

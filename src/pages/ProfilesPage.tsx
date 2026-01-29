@@ -1,16 +1,14 @@
 import { useState, useEffect } from 'react';
-import { 
-  ArrowLeft, 
-  Search, 
-  Trophy, 
-  TrendingUp, 
-  Target, 
-  Flame,
+import {
+  ArrowLeft,
+  Search,
+  Trophy,
+  TrendingUp,
+  Target,
   Medal,
   Crown,
   Users,
   ChevronDown,
-  ChevronUp,
   Loader2,
   Wifi,
   WifiOff
@@ -212,9 +210,9 @@ export function ProfilesPage({ onBack }: ProfilesPageProps) {
 
         {/* Liste ou Détail */}
         {selectedProfile ? (
-          <ProfileDetail 
-            profile={selectedProfile} 
-            onBack={() => setSelectedProfile(null)} 
+          <ProfileDetail
+            profile={selectedProfile}
+            onBack={() => setSelectedProfile(null)}
           />
         ) : (
           <>
@@ -233,8 +231,8 @@ export function ProfilesPage({ onBack }: ProfilesPageProps) {
                 <Users className="w-16 h-16 text-[#666] mx-auto mb-4" />
                 <p className="text-[#b3b3b3] mb-2">Aucun joueur trouvé</p>
                 <p className="text-[#666] text-sm">
-                  {profiles.length === 0 
-                    ? 'Soyez le premier à vous inscrire !' 
+                  {profiles.length === 0
+                    ? 'Soyez le premier à vous inscrire !'
                     : 'Essayez une autre recherche'}
                 </p>
               </div>
@@ -256,7 +254,7 @@ function StatCard({ icon: Icon, label, value, color }: {
   return (
     <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-4">
       <div className="flex items-center gap-3">
-        <div 
+        <div
           className="w-10 h-10 rounded-lg flex items-center justify-center"
           style={{ backgroundColor: `${color}15` }}
         >
@@ -289,7 +287,7 @@ function ProfileCard({ profile, onClick }: { profile: UserStats; onClick: () => 
     >
       <div className="flex items-center gap-4">
         {/* Rang */}
-        <div 
+        <div
           className={cn(
             'w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg bg-gradient-to-br',
             rankStyle.bg,
@@ -341,8 +339,8 @@ function ProfileCard({ profile, onClick }: { profile: UserStats; onClick: () => 
 
 // Composant ProfileDetail
 function ProfileDetail({ profile, onBack }: { profile: UserStats; onBack: () => void }) {
-  const roi = profile.totalWagered > 0 
-    ? ((profile.totalWon - profile.totalWagered) / profile.totalWagered * 100) 
+  const roi = profile.totalWagered > 0
+    ? ((profile.totalWon - profile.totalWagered) / profile.totalWagered * 100)
     : 0;
 
   return (
@@ -358,9 +356,9 @@ function ProfileDetail({ profile, onBack }: { profile: UserStats; onBack: () => 
         <div>
           <h2 className="text-2xl font-bold text-white">{profile.username}</h2>
           <p className="text-[#666] text-sm">
-            Membre depuis {new Date(profile.created_at).toLocaleDateString('fr-FR', { 
-              month: 'long', 
-              year: 'numeric' 
+            Membre depuis {new Date(profile.created_at).toLocaleDateString('fr-FR', {
+              month: 'long',
+              year: 'numeric'
             })}
           </p>
         </div>
@@ -376,7 +374,7 @@ function ProfileDetail({ profile, onBack }: { profile: UserStats; onBack: () => 
       {profile.badges.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {profile.badges.map((badge, i) => (
-            <span 
+            <span
               key={i}
               className="px-3 py-1 bg-[#141414] border border-[#2a2a2a] rounded-full text-sm"
             >
@@ -477,19 +475,19 @@ function ProfileDetail({ profile, onBack }: { profile: UserStats; onBack: () => 
         <h3 className="text-white font-bold mb-4">Répartition des résultats</h3>
         <div className="flex h-4 rounded-full overflow-hidden bg-[#2a2a2a]">
           {profile.wonBets > 0 && (
-            <div 
+            <div
               className="bg-[#1aff6e] transition-all"
               style={{ width: `${(profile.wonBets / profile.totalBets) * 100}%` }}
             />
           )}
           {profile.pendingBets > 0 && (
-            <div 
+            <div
               className="bg-[#ffa502] transition-all"
               style={{ width: `${(profile.pendingBets / profile.totalBets) * 100}%` }}
             />
           )}
           {profile.lostBets > 0 && (
-            <div 
+            <div
               className="bg-[#ff4757] transition-all"
               style={{ width: `${(profile.lostBets / profile.totalBets) * 100}%` }}
             />

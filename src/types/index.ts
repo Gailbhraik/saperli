@@ -36,6 +36,11 @@ export interface Bet {
   odds: number;
   stake: number;
   potentialWin: number;
+  matchData?: {
+    homeTeam: string;
+    awayTeam: string;
+    league: string;
+  };
 }
 
 export interface BetSlip {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Radio, Trophy, Filter, Search, Calendar, Gamepad2, Info } from 'lucide-react';
+import { ArrowLeft, Radio, Trophy, Search, Gamepad2, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { EsportsMatch } from '@/types';
@@ -40,7 +40,7 @@ export function AllBetsPage({ matches, betSlip, onBack }: AllBetsPageProps) {
   // Filtrer les matchs
   const getFilteredMatches = (): EsportsMatch[] => {
     let filtered: EsportsMatch[] = [];
-    
+
     switch (selectedLeague) {
       case 'live':
         filtered = matches.live;
@@ -52,12 +52,12 @@ export function AllBetsPage({ matches, betSlip, onBack }: AllBetsPageProps) {
         filtered = matches.lfl;
         break;
       case 'lck':
-        filtered = matches.all.filter(m => 
+        filtered = matches.all.filter(m =>
           m.league.toLowerCase().includes('lck') || m.league.toLowerCase().includes('korea')
         );
         break;
       case 'lpl':
-        filtered = matches.all.filter(m => 
+        filtered = matches.all.filter(m =>
           m.league.toLowerCase().includes('lpl') || m.league.toLowerCase().includes('china')
         );
         break;
@@ -139,13 +139,13 @@ export function AllBetsPage({ matches, betSlip, onBack }: AllBetsPageProps) {
           <div className="flex flex-wrap gap-3">
             {(Object.keys(leagueInfo) as LeagueFilter[]).map((league) => {
               const info = leagueInfo[league];
-              const count = league === 'all' ? matches.all.length 
-                          : league === 'live' ? matches.live.length
-                          : league === 'lec' ? matches.lec.length
-                          : league === 'lfl' ? matches.lfl.length
-                          : matches.all.filter(m => 
-                              m.league.toLowerCase().includes(league)
-                            ).length;
+              const count = league === 'all' ? matches.all.length
+                : league === 'live' ? matches.live.length
+                  : league === 'lec' ? matches.lec.length
+                    : league === 'lfl' ? matches.lfl.length
+                      : matches.all.filter(m =>
+                        m.league.toLowerCase().includes(league)
+                      ).length;
 
               return (
                 <button
@@ -164,8 +164,8 @@ export function AllBetsPage({ matches, betSlip, onBack }: AllBetsPageProps) {
                   }}
                 >
                   {league !== 'all' && league !== 'live' && LEAGUE_LOGOS[league] && (
-                    <img 
-                      src={LEAGUE_LOGOS[league]} 
+                    <img
+                      src={LEAGUE_LOGOS[league]}
                       alt={info.name}
                       className="w-5 h-5 object-contain"
                       onError={(e) => {
@@ -219,9 +219,9 @@ export function AllBetsPage({ matches, betSlip, onBack }: AllBetsPageProps) {
         {filteredMatches.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredMatches.map((match) => (
-              <MatchCard 
-                key={match.id} 
-                match={match} 
+              <MatchCard
+                key={match.id}
+                match={match}
                 betSlip={betSlip}
                 onMatchClick={handleMatchClick}
               />
@@ -267,10 +267,10 @@ function MatchCard({ match, betSlip, onMatchClick }: MatchCardProps) {
   };
 
   // Déterminer le logo de la ligue
-  const leagueKey = match.league.toLowerCase().includes('lec') ? 'lec' : 
-                    match.league.toLowerCase().includes('lfl') ? 'lfl' :
-                    match.league.toLowerCase().includes('lck') ? 'lck' :
-                    match.league.toLowerCase().includes('lpl') ? 'lpl' : 'lol';
+  const leagueKey = match.league.toLowerCase().includes('lec') ? 'lec' :
+    match.league.toLowerCase().includes('lfl') ? 'lfl' :
+      match.league.toLowerCase().includes('lck') ? 'lck' :
+        match.league.toLowerCase().includes('lpl') ? 'lpl' : 'lol';
 
   return (
     <div
@@ -292,8 +292,8 @@ function MatchCard({ match, betSlip, onMatchClick }: MatchCardProps) {
           style={{ backgroundColor: `${leagueColor}10` }}
         >
           <div className="flex items-center gap-2">
-            <img 
-              src={LEAGUE_LOGOS[leagueKey]} 
+            <img
+              src={LEAGUE_LOGOS[leagueKey]}
               alt={match.league}
               className="w-5 h-5 object-contain"
               onError={(e) => {
@@ -330,9 +330,9 @@ function MatchCard({ match, betSlip, onMatchClick }: MatchCardProps) {
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-[#1a1a1a] rounded-full flex items-center justify-center overflow-hidden">
                   {match.homeTeam.logo ? (
-                    <img 
-                      src={match.homeTeam.logo} 
-                      alt="" 
+                    <img
+                      src={match.homeTeam.logo}
+                      alt=""
                       className="w-6 h-6 object-contain"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
@@ -347,9 +347,9 @@ function MatchCard({ match, betSlip, onMatchClick }: MatchCardProps) {
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-[#1a1a1a] rounded-full flex items-center justify-center overflow-hidden">
                   {match.awayTeam.logo ? (
-                    <img 
-                      src={match.awayTeam.logo} 
-                      alt="" 
+                    <img
+                      src={match.awayTeam.logo}
+                      alt=""
                       className="w-6 h-6 object-contain"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';

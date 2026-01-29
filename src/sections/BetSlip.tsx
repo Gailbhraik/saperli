@@ -16,28 +16,28 @@ interface BetSlipProps {
 export function BetSlip({ betSlip, userBalance, matches, onLoginRequired }: BetSlipProps) {
   const { isLoggedIn } = useAuth();
   const [isMinimized, setIsMinimized] = useState(false);
-  
-  const { 
-    bets, 
-    isOpen, 
-    error, 
-    totalStake, 
-    totalPotentialWin, 
+
+  const {
+    bets,
+    isOpen,
+    error,
+    totalStake,
+    totalPotentialWin,
     canPlaceBets,
-    removeBet, 
-    updateStake, 
-    clearBets, 
-    closeSlip, 
+    removeBet,
+    updateStake,
+    clearBets,
+    closeSlip,
     placeBets,
-    toggleSlip 
+    toggleSlip
   } = betSlip;
 
-  const handlePlaceBets = () => {
+  const handlePlaceBets = async () => {
     if (!isLoggedIn) {
       onLoginRequired?.();
       return;
     }
-    const result = placeBets();
+    const result = await placeBets();
     if (result.success) {
       closeSlip();
     }
@@ -242,10 +242,10 @@ export function BetSlip({ betSlip, userBalance, matches, onLoginRequired }: BetS
                     : 'bg-[#2a2a2a] text-[#666] cursor-not-allowed'
               )}
             >
-              {!isLoggedIn 
+              {!isLoggedIn
                 ? 'SE CONNECTER POUR PARIER'
-                : totalStake > userBalance 
-                  ? `Solde insuffisant (${userBalance.toFixed(2)}€)` 
+                : totalStake > userBalance
+                  ? `Solde insuffisant (${userBalance.toFixed(2)}€)`
                   : 'PLACER LE PARI'}
             </Button>
           </div>
