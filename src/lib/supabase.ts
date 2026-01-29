@@ -2,10 +2,14 @@ import { createClient } from '@supabase/supabase-js';
 
 // Configuration Supabase
 // Tu devras créer un projet sur https://supabase.com et remplacer ces valeurs
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Supabase configuration missing. Please check your .env file.');
+}
+
+export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
 
 // Types pour la base de données
 export interface DbUser {
@@ -119,7 +123,7 @@ export async function signOut(): Promise<void> {
 // Récupérer l'utilisateur courant
 export async function getCurrentUser(): Promise<DbUser | null> {
   const { data: { user } } = await supabase.auth.getUser();
-  
+
   if (!user) return null;
 
   const { data: userData } = await supabase
@@ -364,7 +368,7 @@ export async function getAllUsersStats(): Promise<UserStats[]> {
 
   const stats: UserStats[] = users.map(user => {
     const userBets = allBets.filter(b => b.user_id === user.id);
-    
+
     const totalBets = userBets.length;
     const wonBets = userBets.filter(b => b.status === 'won').length;
     const lostBets = userBets.filter(b => b.status === 'lost').length;

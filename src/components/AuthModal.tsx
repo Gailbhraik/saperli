@@ -83,8 +83,14 @@ export function AuthModal({ isOpen, onClose, defaultTab = 'login' }: AuthModalPr
           setError(result.error || 'Erreur lors de la connexion');
         }
       }
-    } catch (err) {
-      setError('Une erreur est survenue');
+    } catch (err: any) {
+      console.error('Auth Error:', err);
+      // "Failed to fetch" est souvent un problème réseau ou de config
+      if (err.message === 'Failed to fetch') {
+        setError('Impossible de joindre le serveur. Vérifiez votre connexion ou la configuration.');
+      } else {
+        setError(err.message || 'Une erreur est survenue');
+      }
     }
 
     setIsSubmitting(false);
@@ -130,8 +136,8 @@ export function AuthModal({ isOpen, onClose, defaultTab = 'login' }: AuthModalPr
             <button
               onClick={() => handleTabChange('login')}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${activeTab === 'login'
-                  ? 'bg-[#1aff6e] text-[#0a0a0a]'
-                  : 'text-[#666] hover:text-white'
+                ? 'bg-[#1aff6e] text-[#0a0a0a]'
+                : 'text-[#666] hover:text-white'
                 }`}
             >
               Connexion
@@ -139,8 +145,8 @@ export function AuthModal({ isOpen, onClose, defaultTab = 'login' }: AuthModalPr
             <button
               onClick={() => handleTabChange('register')}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${activeTab === 'register'
-                  ? 'bg-[#1aff6e] text-[#0a0a0a]'
-                  : 'text-[#666] hover:text-white'
+                ? 'bg-[#1aff6e] text-[#0a0a0a]'
+                : 'text-[#666] hover:text-white'
                 }`}
             >
               Inscription
