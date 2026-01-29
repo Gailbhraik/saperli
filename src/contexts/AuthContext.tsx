@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { type AuthChangeEvent, type Session } from '@supabase/supabase-js';
 import {
   supabase,
   signUp as supabaseSignUp,
@@ -127,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
 
     // Écouter les changements d'auth
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
       if (event === 'SIGNED_IN' && session?.user) {
         const dbUser = await getCurrentUser();
         if (dbUser) {
