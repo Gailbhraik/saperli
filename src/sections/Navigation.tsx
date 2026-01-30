@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, User as UserIcon, Wallet, LogOut, LogIn, Gamepad2, List, Trophy } from 'lucide-react';
+import { Menu, X, User as UserIcon, Wallet, LogOut, LogIn, Gamepad2, List, Trophy, Globe, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -7,9 +7,11 @@ interface NavigationProps {
   onOpenAuth: (tab?: 'login' | 'register') => void;
   onViewAllBets?: () => void;
   onViewProfiles?: () => void;
+  onViewGlobe?: () => void;
+  onViewPlayers?: () => void;
 }
 
-export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: NavigationProps) {
+export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles, onViewGlobe, onViewPlayers }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -88,6 +90,22 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
             >
               <Trophy className="w-4 h-4" />
               Classement
+            </button>
+
+            <button
+              onClick={onViewGlobe}
+              className="text-[#1aff6e] hover:text-white transition-colors duration-300 text-sm font-medium flex items-center gap-1.5 px-3 py-1.5 bg-[#1aff6e]/10 rounded-lg border border-[#1aff6e]/30 hover:bg-[#1aff6e]/20"
+            >
+              <Globe className="w-4 h-4" />
+              Carte
+            </button>
+
+            <button
+              onClick={onViewPlayers}
+              className="text-[#f59e0b] hover:text-white transition-colors duration-300 text-sm font-medium flex items-center gap-1.5 px-3 py-1.5 bg-[#f59e0b]/10 rounded-lg border border-[#f59e0b]/30 hover:bg-[#f59e0b]/20"
+            >
+              <Users className="w-4 h-4" />
+              Joueurs
             </button>
           </div>
 
@@ -197,7 +215,7 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
           )}
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-4 gap-3">
             <button
               onClick={() => {
                 onViewAllBets?.();
@@ -206,7 +224,7 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
               className="flex items-center justify-center gap-2 px-4 py-3 bg-[#00d4ff]/10 border border-[#00d4ff]/30 rounded-lg text-[#00d4ff] font-medium"
             >
               <List className="w-4 h-4" />
-              Tous les paris
+              Paris
             </button>
             <button
               onClick={() => {
@@ -217,6 +235,26 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles }: Naviga
             >
               <Trophy className="w-4 h-4" />
               Classement
+            </button>
+            <button
+              onClick={() => {
+                onViewGlobe?.();
+                setIsMobileMenuOpen(false);
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-[#1aff6e]/10 border border-[#1aff6e]/30 rounded-lg text-[#1aff6e] font-medium"
+            >
+              <Globe className="w-4 h-4" />
+              Carte
+            </button>
+            <button
+              onClick={() => {
+                onViewPlayers?.();
+                setIsMobileMenuOpen(false);
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-[#f59e0b]/10 border border-[#f59e0b]/30 rounded-lg text-[#f59e0b] font-medium"
+            >
+              <Users className="w-4 h-4" />
+              Joueurs
             </button>
           </div>
 

@@ -13,13 +13,15 @@ import { Footer } from '@/sections/Footer';
 import { AuthModal } from '@/components/AuthModal';
 import { AllBetsPage } from '@/pages/AllBetsPage';
 import { ProfilesPage } from '@/pages/ProfilesPage';
+import { GlobePage } from '@/pages/GlobePage';
+import { PlayersPage } from '@/pages/PlayersPage';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { useBetSlip } from '@/hooks/useBetSlip';
 import { useMatches } from '@/hooks/useMatches';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 
-type PageType = 'home' | 'all-bets' | 'profiles';
+type PageType = 'home' | 'all-bets' | 'profiles' | 'globe' | 'players';
 
 function AppContent() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -109,31 +111,37 @@ function AppContent() {
     );
   }
 
-  // Page "Tous les paris"
-  if (currentPage === 'all-bets') {
+  // Page Globe
+  if (currentPage === 'globe') {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-white font-sans">
-        <AllBetsPage
-          matches={{
-            all: allMatches,
-            lec: lecMatches,
-            lfl: lflMatches,
-            international: allMatches.filter(m =>
-              !m.league.toLowerCase().includes('lec') &&
-              !m.league.toLowerCase().includes('lfl')
-            ),
-            live: liveMatches,
-          }}
-          betSlip={betSlip}
-          onBack={() => handleNavigate('home')}
+        <GlobePage onBack={() => handleNavigate('home')} />
+
+        <AuthModal
+          isOpen={authModalOpen}
+          onClose={() => setAuthModalOpen(false)}
+          defaultTab={authModalTab}
         />
 
-        <BetSlip
-          betSlip={betSlip}
-          userBalance={currentUser?.balance || 0}
-          matches={allMatches}
-          onLoginRequired={() => handleOpenAuth('login')}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: '#141414',
+              border: '1px solid #2a2a2a',
+              color: '#fff',
+            },
+          }}
         />
+      </div>
+    );
+  }
+
+  // Page Joueurs
+  if (currentPage === 'players') {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] text-white font-sans">
+        <PlayersPage onBack={() => handleNavigate('home')} />
 
         <AuthModal
           isOpen={authModalOpen}
@@ -162,6 +170,8 @@ function AppContent() {
         onOpenAuth={handleOpenAuth}
         onViewAllBets={() => handleNavigate('all-bets')}
         onViewProfiles={() => handleNavigate('profiles')}
+        onViewGlobe={() => handleNavigate('globe')}
+        onViewPlayers={() => handleNavigate('players')}
       />
 
       <main>
