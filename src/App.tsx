@@ -163,6 +163,45 @@ function AppContent() {
     );
   }
 
+  // Page All Bets
+  if (currentPage === 'all-bets') {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] text-white font-sans">
+        <AllBetsPage
+          matches={{
+            all: allMatches,
+            lec: lecMatches,
+            lfl: lflMatches,
+            international: allMatches.filter(m =>
+              !m.league.toLowerCase().includes('lec') &&
+              !m.league.toLowerCase().includes('lfl')
+            ),
+            live: liveMatches,
+          }}
+          betSlip={betSlip}
+          onBack={() => handleNavigate('home')}
+        />
+
+        <AuthModal
+          isOpen={authModalOpen}
+          onClose={() => setAuthModalOpen(false)}
+          defaultTab={authModalTab}
+        />
+
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: '#141414',
+              border: '1px solid #2a2a2a',
+              color: '#fff',
+            },
+          }}
+        />
+      </div>
+    );
+  }
+
   // Page d'accueil
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-sans">
