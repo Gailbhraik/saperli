@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, User as UserIcon, Wallet, LogOut, LogIn, Gamepad2, List, Trophy, Globe, Users } from 'lucide-react';
+import { Menu, X, User as UserIcon, Wallet, LogOut, LogIn, Gamepad2, List, Trophy, Globe, Users, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -9,9 +9,10 @@ interface NavigationProps {
   onViewProfiles?: () => void;
   onViewGlobe?: () => void;
   onViewPlayers?: () => void;
+  onViewPolymarketBot?: () => void;
 }
 
-export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles, onViewGlobe, onViewPlayers }: NavigationProps) {
+export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles, onViewGlobe, onViewPlayers, onViewPolymarketBot }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -106,6 +107,14 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles, onViewGl
             >
               <Users className="w-4 h-4" />
               Joueurs
+            </button>
+
+            <button
+              onClick={onViewPolymarketBot}
+              className="text-[#8b5cf6] hover:text-white transition-colors duration-300 text-sm font-medium flex items-center gap-1.5 px-3 py-1.5 bg-[#8b5cf6]/10 rounded-lg border border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/20"
+            >
+              <Bot className="w-4 h-4" />
+              Bot IA
             </button>
           </div>
 
@@ -255,6 +264,16 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles, onViewGl
             >
               <Users className="w-4 h-4" />
               Joueurs
+            </button>
+            <button
+              onClick={() => {
+                onViewPolymarketBot?.();
+                setIsMobileMenuOpen(false);
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-[#8b5cf6]/10 border border-[#8b5cf6]/30 rounded-lg text-[#8b5cf6] font-medium"
+            >
+              <Bot className="w-4 h-4" />
+              Bot IA
             </button>
           </div>
 
