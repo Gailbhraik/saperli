@@ -30,6 +30,7 @@ import type { PolymarketRecommendation, PolymarketMarket, PolymarketAnalysis } f
 import { cn } from '@/lib/utils';
 import { calculateMarketScore } from '@/services/api-polymarket';
 import { PriceChart, MarketTrendsGrid } from '@/components/PriceChart';
+import { BitcoinPriceDisplay } from '@/components/BitcoinPrice';
 
 interface PolymarketBotPageProps {
   onBack: () => void;
@@ -90,6 +91,7 @@ export function PolymarketBotPage({ onBack }: PolymarketBotPageProps) {
             </div>
 
             <div className="flex items-center gap-3">
+              <BitcoinPriceDisplay />
               <Button
                 variant="outline"
                 size="sm"
