@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, User as UserIcon, Wallet, LogOut, LogIn, Gamepad2, List, Trophy, Globe, Users, Bot } from 'lucide-react';
+import { Menu, X, User as UserIcon, Wallet, LogOut, LogIn, Gamepad2, List, Trophy, Globe, Users, Bot, Egg } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -10,9 +10,10 @@ interface NavigationProps {
   onViewGlobe?: () => void;
   onViewPlayers?: () => void;
   onViewPolymarketBot?: () => void;
+  onViewOeuf?: () => void;
 }
 
-export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles, onViewGlobe, onViewPlayers, onViewPolymarketBot }: NavigationProps) {
+export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles, onViewGlobe, onViewPlayers, onViewPolymarketBot, onViewOeuf }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -115,6 +116,14 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles, onViewGl
             >
               <Bot className="w-4 h-4" />
               Bot IA
+            </button>
+
+            <button
+              onClick={onViewOeuf}
+              className="text-[#c1ff12] hover:text-white transition-colors duration-300 text-sm font-medium flex items-center gap-1.5 px-3 py-1.5 bg-[#c1ff12]/10 rounded-lg border border-[#c1ff12]/30 hover:bg-[#c1ff12]/20"
+            >
+              <Egg className="w-4 h-4" />
+              Oeuf
             </button>
           </div>
 
@@ -274,6 +283,16 @@ export function Navigation({ onOpenAuth, onViewAllBets, onViewProfiles, onViewGl
             >
               <Bot className="w-4 h-4" />
               Bot IA
+            </button>
+            <button
+              onClick={() => {
+                onViewOeuf?.();
+                setIsMobileMenuOpen(false);
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-[#c1ff12]/10 border border-[#c1ff12]/30 rounded-lg text-[#c1ff12] font-medium"
+            >
+              <Egg className="w-4 h-4" />
+              Oeuf
             </button>
           </div>
 

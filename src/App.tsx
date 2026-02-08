@@ -16,13 +16,14 @@ import { ProfilesPage } from '@/pages/ProfilesPage';
 import { GlobePage } from '@/pages/GlobePage';
 import { PlayersPage } from '@/pages/PlayersPage';
 import { PolymarketBotPage } from '@/pages/PolymarketBotPage';
+import { OeufPage } from '@/pages/OeufPage';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { useBetSlip } from '@/hooks/useBetSlip';
 import { useMatches } from '@/hooks/useMatches';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 
-type PageType = 'home' | 'all-bets' | 'profiles' | 'globe' | 'players' | 'polymarket-bot';
+type PageType = 'home' | 'all-bets' | 'profiles' | 'globe' | 'players' | 'polymarket-bot' | 'oeuf';
 
 function AppContent() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -190,6 +191,15 @@ function AppContent() {
     );
   }
 
+  // Page Oeuf
+  if (currentPage === 'oeuf') {
+    return (
+      <div className="min-h-screen bg-black text-white font-sans">
+        <OeufPage onBack={() => handleNavigate('home')} />
+      </div>
+    );
+  }
+
   // Page All Bets
   if (currentPage === 'all-bets') {
     return (
@@ -239,6 +249,7 @@ function AppContent() {
           onViewGlobe={() => handleNavigate('globe')}
           onViewPlayers={() => handleNavigate('players')}
           onViewPolymarketBot={() => handleNavigate('polymarket-bot')}
+          onViewOeuf={() => handleNavigate('oeuf')}
         />
 
       <main>
