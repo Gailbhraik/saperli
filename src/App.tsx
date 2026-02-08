@@ -16,13 +16,14 @@ import { ProfilesPage } from '@/pages/ProfilesPage';
 import { GlobePage } from '@/pages/GlobePage';
 import { PlayersPage } from '@/pages/PlayersPage';
 import { PolymarketBotPage } from '@/pages/PolymarketBotPage';
+import { LuxuryPosterPage } from '@/pages/LuxuryPosterPage';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { useBetSlip } from '@/hooks/useBetSlip';
 import { useMatches } from '@/hooks/useMatches';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 
-type PageType = 'home' | 'all-bets' | 'profiles' | 'globe' | 'players' | 'polymarket-bot';
+type PageType = 'home' | 'all-bets' | 'profiles' | 'globe' | 'players' | 'polymarket-bot' | 'luxury-poster';
 
 function AppContent() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -190,6 +191,25 @@ function AppContent() {
     );
   }
 
+  // Page Luxury Poster
+  if (currentPage === 'luxury-poster') {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] text-white font-sans">
+        <LuxuryPosterPage onBack={() => handleNavigate('home')} />
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: '#141414',
+              border: '1px solid #2a2a2a',
+              color: '#fff',
+            },
+          }}
+        />
+      </div>
+    );
+  }
+
   // Page All Bets
   if (currentPage === 'all-bets') {
     return (
@@ -239,6 +259,7 @@ function AppContent() {
           onViewGlobe={() => handleNavigate('globe')}
           onViewPlayers={() => handleNavigate('players')}
           onViewPolymarketBot={() => handleNavigate('polymarket-bot')}
+          onViewLuxuryPoster={() => handleNavigate('luxury-poster')}
         />
 
       <main>
