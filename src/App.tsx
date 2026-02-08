@@ -242,15 +242,15 @@ function AppContent() {
   // Page d'accueil
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-sans">
-        <Navigation
-          onOpenAuth={handleOpenAuth}
-          onViewAllBets={() => handleNavigate('all-bets')}
-          onViewProfiles={() => handleNavigate('profiles')}
-          onViewGlobe={() => handleNavigate('globe')}
-          onViewPlayers={() => handleNavigate('players')}
-          onViewPolymarketBot={() => handleNavigate('polymarket-bot')}
-          onViewOeuf={() => handleNavigate('oeuf')}
-        />
+      <Navigation
+        onOpenAuth={handleOpenAuth}
+        onViewAllBets={() => handleNavigate('all-bets')}
+        onViewProfiles={() => handleNavigate('profiles')}
+        onViewGlobe={() => handleNavigate('globe')}
+        onViewPlayers={() => handleNavigate('players')}
+        onViewPolymarketBot={() => handleNavigate('polymarket-bot')}
+        onViewOeuf={() => handleNavigate('oeuf')}
+      />
 
       <main>
         <Hero
